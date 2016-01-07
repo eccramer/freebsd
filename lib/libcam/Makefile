@@ -43,4 +43,8 @@ CFLAGS+=	-I${.CURDIR} -I${SDIR}
 
 SHLIB_MAJOR=	7
 
+.if ${MK_TESTS} != "no"
+SUBDIR+=	tests
+.endif
+
 .include <bsd.lib.mk>
