@@ -10,6 +10,8 @@
 
 #include <camlib.h>
 
+/* cam_get_device tests */
+
 ATF_TC(libcam_get_device_null_path);
 
 ATF_TC_HEAD(libcam_get_device_null_path, tc)
@@ -35,7 +37,8 @@ ATF_TC(libcam_get_device_empty_path);
 
 ATF_TC_HEAD(libcam_get_device_empty_path, tc)
 {
-	atf_tc_set_md_var(tc, "descr", "test cam_get_device with an empty path string.");
+	atf_tc_set_md_var(tc, "descr", 
+			  "test cam_get_device with an empty path string.");
 }
 
 ATF_TC_BODY(libcam_get_device_empty_path, tc)
@@ -56,7 +59,8 @@ ATF_TC(libcam_get_device_no_text_after_slash);
 
 ATF_TC_HEAD(libcam_get_device_no_text_after_slash, tc)
 {
-	atf_tc_set_md_var(tc, "descr", "test cam_get_device with an invalid device path that is only /.");
+	atf_tc_set_md_var(tc, "descr", 
+			  "test cam_get_device with an invalid device path that is only /.");
 }
 
 ATF_TC_BODY(libcam_get_device_no_text_after_slash, tc)
@@ -71,14 +75,14 @@ ATF_TC_BODY(libcam_get_device_no_text_after_slash, tc)
 	atf_tc_expect_fail("Passing in /, a bad device path.");
 
 	ATF_CHECK(cam_get_device(path, dev_name, devnamelen, &unit) == 0);
-
 }
 
 ATF_TC(libcam_get_device_name_starts_with_number);
 
 ATF_TC_HEAD(libcam_get_device_name_starts_with_number, tc)
 {
-	atf_tc_set_md_var(tc, "descr", "test cam_get_device with an invalid device name that starts with a number.");
+	atf_tc_set_md_var(tc, "descr", 
+			  "test cam_get_device with a device name that starts with a number.");
 }
 
 ATF_TC_BODY(libcam_get_device_name_starts_with_number, tc)
@@ -118,16 +122,39 @@ ATF_TC_BODY(libcam_get_device_valid_device, tc)
 	result = cam_get_device(path, dev_name, devnamelen, &unit);
 
 	if(result != 0)
-		atf_tc_fail("Expected 0, got %d\n", result);
+		atf_tc_fail("Expected 0, got %d", result);
 
 	if(unit != expected_unit)
-		atf_tc_fail("Unit num does not match expected unit num. Expected: %d. Got: %d\n", expected_unit, unit);
+		atf_tc_fail("Unit num does not match expected unit num. \
+			    Expected: %d. Got: %d", expected_unit, unit);
 
 	if(strcmp(expected_dev_name, dev_name))
-		atf_tc_fail("dev_name and expected_dev_name did not match.");
+		atf_tc_fail("dev_name and expected_dev_name did not match. \
+			    Expected %s. Got %s.", expected_dev_name, dev_name);
 
 	atf_tc_pass();
+}
 
+/* cam_open_device tests */
+
+ATF_TC(libcam_open_device_not_exists);
+
+ATF_TC_HEAD(libcam_open_device_not_exists, tc)
+{
+	atf_tc_set_md_var(tc, "descr", "test cam_open_device with a device that doesn't exist.");
+}
+
+ATF_TC_BODY(libcam_open_device_not_exists, tc)
+{
+	char* path = "/dev/foo1";
+	static struct cam_device * result;
+	
+	result = cam_open_device(path, O_RDONLY);
+
+	if(result != NULL)
+		atf_tc_fail("Expected null, but got a device struct pointer back.");
+
+	atf_tc_pass();
 }
 
 ATF_TP_ADD_TCS(tp)
@@ -137,6 +164,7 @@ ATF_TP_ADD_TCS(tp)
 	ATF_TP_ADD_TC(tp, libcam_get_device_name_starts_with_number);
 	ATF_TP_ADD_TC(tp, libcam_get_device_no_text_after_slash);
 	ATF_TP_ADD_TC(tp, libcam_get_device_valid_device);
+	ATF_TP_ADD_TC(tp, libcam_open_device_not_exists);
 
 	return atf_no_error();
 }
