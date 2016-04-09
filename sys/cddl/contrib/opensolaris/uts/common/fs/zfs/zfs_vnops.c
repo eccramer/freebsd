@@ -22,6 +22,7 @@
  * Copyright (c) 2005, 2010, Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2012, 2015 by Delphix. All rights reserved.
  * Copyright 2014 Nexenta Systems, Inc.  All rights reserved.
+ * Copyright (c) 2014 Integros [integros.com]
  */
 
 /* Portions Copyright 2007 Jeremy Teo */
@@ -2009,12 +2010,9 @@ top:
 	dmu_tx_hold_zap(tx, zfsvfs->z_unlinkedobj, FALSE, NULL);
 
 	/*
-	 * Mark this transaction as typically resulting in a net free of
-	 * space, unless object removal will be delayed indefinitely
-	 * (due to active holds on the vnode due to the file being open).
+	 * Mark this transaction as typically resulting in a net free of space
 	 */
-	if (may_delete_now)
-		dmu_tx_mark_netfree(tx);
+	dmu_tx_mark_netfree(tx);
 
 	error = dmu_tx_assign(tx, waited ? TXG_WAITED : TXG_NOWAIT);
 	if (error) {
@@ -5775,7 +5773,7 @@ zfs_getpages(struct vnode *vp, vm_page_t *m, int count, int *rbehind,
 	off_t startoff, endoff;
 	int i, error;
 	vm_pindex_t reqstart, reqend;
-	int lsize, reqsize, size;
+	int lsize, size;
 
 	object = m[0]->object;
 	error = 0;
@@ -5799,7 +5797,7 @@ zfs_getpages(struct vnode *vp, vm_page_t *m, int count, int *rbehind,
 	}
 
 	PCPU_INC(cnt.v_vnodein);
-	PCPU_ADD(cnt.v_vnodepgsin, reqsize);
+	PCPU_ADD(cnt.v_vnodepgsin, count);
 
 	lsize = PAGE_SIZE;
 	if (IDX_TO_OFF(mlast->pindex) + lsize > object->un_pager.vnp.vnp_size)

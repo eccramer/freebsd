@@ -1138,14 +1138,6 @@ static struct da_quirk_entry da_quirk_table[] =
 	},
 	{
 		/*
-		 * Samsung 843T Series SSDs
-		 * 4k optimised
-		 */
-		{ T_DIRECT, SIP_MEDIA_FIXED, "ATA", "SAMSUNG MZ7WD*", "*" },
-		/*quirks*/DA_Q_4K
-	},
- 	{
- 		/*
 		 * Samsung 850 SSDs
 		 * 4k optimised & trim only works in 4k requests + 4k aligned
 		 */
@@ -1154,10 +1146,13 @@ static struct da_quirk_entry da_quirk_table[] =
 	},
 	{
 		/*
-		 * Samsung PM853T Series SSDs
+		 * Samsung 843T Series SSDs (MZ7WD*)
+		 * Samsung PM851 Series SSDs (MZ7TE*)
+		 * Samsung PM853T Series SSDs (MZ7GE*)
+		 * Samsung SM863 Series SSDs (MZ7KM*)
 		 * 4k optimised
 		 */
-		{ T_DIRECT, SIP_MEDIA_FIXED, "ATA", "SAMSUNG MZ7GE*", "*" },
+		{ T_DIRECT, SIP_MEDIA_FIXED, "ATA", "SAMSUNG MZ7*", "*" },
 		/*quirks*/DA_Q_4K
 	},
 	{
@@ -3228,7 +3223,8 @@ dadone(struct cam_periph *periph, union ccb *done_ccb)
 					softc->state = DA_STATE_PROBE_RC;
 					xpt_schedule(periph, priority);
 					return;
-				} else
+				}
+
 				/*
 				 * Attach to anything that claims to be a
 				 * direct access or optical disk device,

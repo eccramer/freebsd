@@ -70,6 +70,7 @@ __FBSDID("$FreeBSD$");
 #include <sys/bus.h>
 #include <sys/kernel.h>
 #include <sys/kthread.h>
+#include <sys/malloc.h>
 #include <sys/interrupt.h>
 #include <sys/lock.h>
 #include <sys/mbuf.h>
@@ -1166,9 +1167,6 @@ netisr_start(void *arg)
 	STAILQ_FOREACH(pc, &cpuhead, pc_allcpu) {
 		if (nws_count >= netisr_maxthreads)
 			break;
-		/* XXXRW: Is skipping absent CPUs still required here? */
-		if (CPU_ABSENT(pc->pc_cpuid))
-			continue;
 		/* Worker will already be present for boot CPU. */
 		if (pc->pc_netisr != NULL)
 			continue;

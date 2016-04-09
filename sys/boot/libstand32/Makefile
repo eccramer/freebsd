@@ -10,6 +10,7 @@ LIBSTAND_CPUARCH=${MACHINE_CPUARCH}
 .endif
 LIBC_SRC=	${LIBSTAND_SRC}/../libc
 INTERNALLIB=
+INCS=
 MAN=
 .PATH:	${LIBSTAND_SRC}
 
@@ -22,6 +23,6 @@ CFLAGS+=	-m32 -I.
 .if ${MACHINE_CPUARCH} == "amd64"
 CLEANFILES+= machine
 beforedepend ${OBJS}: machine
-machine:
+machine: .NOMETA
 	ln -fs ${.CURDIR}/../../i386/include machine
 .endif
